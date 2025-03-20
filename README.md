@@ -30,28 +30,7 @@ This repository is a collection of Python programs developed as part of my train
         
         9) Print second largest prime number of n and return the 
             time taken to find the number(in seconds).
-## PROGRAM LIST
 
-        1) Create a file and write user inputted text into it.
-
-        2) Read a file and count the number of words in it.
-
-        3) Find a word and replace it with another word in a file.
-
-        4) Remove all the empty line from a text file.
-
-        5) Sort the lines of a file alphabetically and save it to 
-            the another file.
-
-        6) Search a specific text in a file and return the line 
-            number and count of occurences of a file.
-
-        7) Print prime number for the value n.
-
-        8) Largest prime number of n.
-        
-        9) Print second largest prime number of n and return the 
-            time taken to find the number(in seconds).
 ## HOW TO RUN?
 
 To run any of the Python programs in this repository, follow these steps:
