@@ -31,6 +31,10 @@ This repository is a collection of Python programs developed as part of my train
         9) Print second largest prime number of n and return the 
             time taken to find the number(in seconds).
 
+        10) program to get 'Hello World!' from an API using Flask.
+
+        11) write an endpoint to perform arithmetic calculation.
+
 ## HOW TO RUN?
 
 To run any of the Python programs in this repository, follow these steps:
@@ -51,8 +55,17 @@ To run any of the Python programs in this repository, follow these steps:
 
     https://github.com/suriya-3108/TRAINING.git
 
-    
-    
+## INSTALL FLASK
+
+      1) install Flask using pip:
+
+                pip install Flask
+
+        2) Verify the installation by checking the Flask version:
+
+                flask --version
+
+
 ## TECHNOLOGIES USED
 
 Programming Language: Python 3.x
