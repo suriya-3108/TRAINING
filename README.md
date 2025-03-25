@@ -35,6 +35,9 @@ This repository is a collection of Python programs developed as part of my train
 
         11) write an endpoint to perform arithmetic calculation.
 
+        12) Write an end point to get user Details and store it in
+              the JSON file
+
 ## HOW TO RUN?
 
 To run any of the Python programs in this repository, follow these steps:
