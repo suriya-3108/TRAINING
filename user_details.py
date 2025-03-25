@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import datetime
 
 # Connect to MongoDB Atlas - REPLACE WITH YOUR CONNECTION STRING
-connection_string = "mongodb+srv://suriya3108:beast000720S@cluster0.nz00g.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+connection_string = "mongodb+srv://<username>:<password>@cluster0.nz00g.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(connection_string)
 
 # Create/access database and collection
