@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+            color: #444;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #e0e0e0;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: white;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Management System</h1>
+    <div class="container">
+        <div class="section">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('createTab')">Create User</div>
+                <div class="tab" onclick="switchTab('editTab')">Edit User</div>
+            </div>
+            
+            <!-- Create User Tab -->
+            <div id="createTab" class="tab-content active">
+                <h2>Create New User</h2>
+                <label>Name:</label>
+                <input type="text" id="newName" placeholder="Enter name">
+                <label>Email:</label>
+                <input type="email" id="newEmail" placeholder="Enter email">
+                <button id="createUserBtn" class="btn-primary">Create User</button>
+                <div id="createMessage" class="message"></div>
+            </div>
+            
+            <!-- Edit User Tab -->
+            <div id="editTab" class="tab-content">
+                <h2>Edit Existing User</h2>
+                <label>User ID:</label>
+                <input type="text" id="editUserId" placeholder="Enter user ID">
+                <button id="fetchUserBtn" class="btn-secondary">Fetch User</button>
+                
+                <div id="editUserForm" style="display: none; margin-top: 20px;">
+                    <label>Name:</label>
+                    <input type="text" id="editName" placeholder="Name">
+                    <label>Email:</label>
+                    <input type="email" id="editEmail" placeholder="Email">
+                    <button id="updateUserBtn" class="btn-primary">Update User</button>
+                    <button id="deleteUserBtn" class="btn-danger">Delete User</button>
+                </div>
+                <div id="editMessage" class="message"></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>All Users</h2>
+            <button id="refreshBtn" class="btn-secondary">Refresh List</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://93oe2l1uzg.execute-api.ap-southeast-2.amazonaws.com/prod/users';
+
+        // Tab switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Display message
+        function showMessage(elementId, text, isSuccess) {
+            const messageDiv = document.getElementById(elementId);
+            messageDiv.textContent = text;
+            messageDiv.className = isSuccess ? 'message success' : 'message error';
+            messageDiv.style.display = 'block';
+        }
+
+        // Fetch all users
+        async function fetchUsers() {
+            try {
+                const response = await fetch(API_BASE_URL);
+                if (!response.ok) throw new Error('Failed to fetch users');
+                return await response.json();
+            } catch (error) {
+                showMessage('editMessage', error.message, false);
+                return [];
+            }
+        }
+
+        // Fetch single user by ID
+        async function fetchUserById(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/${id}`);
+                if (!response.ok) throw new Error('User not found');
+                return await response.json();
+            } catch (error) {
+                showMessage('editMessage', error.message, false);
+                return null;
+            }
+        }
+
+        // Render users in the table
+        async function renderUsers() {
+            const users = await fetchUsers();
+            const userTable = document.getElementById('userTable');
+            userTable.innerHTML = '';
+            
+            users.forEach(user => {
+                userTable.innerHTML += `
+                    <tr>
+                        <td>${user._id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Create new user
+        document.getElementById('createUserBtn').addEventListener('click', async () => {
+            const name = document.getElementById('newName').value.trim();
+            const email = document.getElementById('newEmail').value.trim();
+
+            if (!name || !email) {
+                showMessage('createMessage', 'Name and email are required', false);
+                return;
+            }
+
+            try {
+                const response = await fetch(API_BASE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email })
+                });
+
+                if (!response.ok) throw new Error('Failed to create user');
+                
+                const newUser = await response.json();
+                showMessage('createMessage', `User created successfully with ID: ${newUser._id}`, true);
+                document.getElementById('newName').value = '';
+                document.getElementById('newEmail').value = '';
+                renderUsers();
+            } catch (error) {
+                showMessage('createMessage', error.message, false);
+            }
+        });
+
+        // Fetch user for editing
+        document.getElementById('fetchUserBtn').addEventListener('click', async () => {
+            const userId = document.getElementById('editUserId').value.trim();
+            if (!userId) {
+                showMessage('editMessage', 'Please enter a user ID', false);
+                return;
+            }
+
+            const user = await fetchUserById(userId);
+            if (user) {
+                document.getElementById('editName').value = user.name;
+                document.getElementById('editEmail').value = user.email;
+                document.getElementById('editUserForm').style.display = 'block';
+                showMessage('editMessage', 'User loaded for editing', true);
+            }
+        });
+
+        // Update user
+        document.getElementById('updateUserBtn').addEventListener('click', async () => {
+            const userId = document.getElementById('editUserId').value.trim();
+            const name = document.getElementById('editName').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+
+            if (!userId || !name || !email) {
+                showMessage('editMessage', 'All fields are required', false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email })
+                });
+
+                if (!response.ok) throw new Error('Failed to update user');
+                
+                showMessage('editMessage', 'User updated successfully', true);
+                renderUsers();
+            } catch (error) {
+                showMessage('editMessage', error.message, false);
+            }
+        });
+
+        // Delete user
+        document.getElementById('deleteUserBtn').addEventListener('click', async () => {
+            const userId = document.getElementById('editUserId').value.trim();
+            if (!userId) {
+                showMessage('editMessage', 'Please enter a user ID', false);
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete user ${userId}?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/${userId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Failed to delete user');
+                
+                showMessage('editMessage', 'User deleted successfully', true);
+                document.getElementById('editUserForm').style.display = 'none';
+                document.getElementById('editName').value = '';
+                document.getElementById('editEmail').value = '';
+                renderUsers();
+            } catch (error) {
+                showMessage('editMessage', error.message, false);
+            }
+        });
+
+        // Refresh user list
+        document.getElementById('refreshBtn').addEventListener('click', renderUsers);
+
+        // Initial load
+        renderUsers();
+    </script>
+</body>
+</html>
