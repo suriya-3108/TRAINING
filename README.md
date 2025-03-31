@@ -36,7 +36,15 @@ This repository is a collection of Python programs developed as part of my train
         11) write an endpoint to perform arithmetic calculation.
 
         12) Write an end point to get user Details and store it in
-              the JSON file
+              the JSON file.
+
+        13) create a MongoDB database in the cloud and add usersname and passwords to a collection.
+
+        14) create a new collection and write a program to store a series of numbers (n) in MongoDB.
+
+        15) create 'Hello World' endpoint in Lambda.
+
+        16) Write a Lambda function to perform CRUD operations.
 
 ## HOW TO RUN?
 
